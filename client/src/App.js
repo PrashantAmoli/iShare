@@ -112,10 +112,17 @@ const App = () => {
 	const [messages, setMessages] = useState([])
 	const [message, setMessage] = useState('')
 	const [file, setFile] = useState()
+	const [username, setUsername] = useState('')
 
 	const socketRef = useRef()
 
 	useEffect(() => {
+		function getUsername() {
+			const name = prompt('Enter your name:')
+			setUsername(name)
+		}
+		getUsername()
+
 		socketRef.current = io.connect('/')
 
 		socketRef.current.on('your id', id => {
@@ -148,11 +155,12 @@ const App = () => {
 			socketRef.current.emit('send message', messageObject)
 		} else {
 			const messageObject = {
-				body: message,
+				body: `${username}🢂 ${message}`,
 				id: yourID,
 				type: 'text',
 			}
 			setMessage('')
+			setFile('')
 			socketRef.current.emit('send message', messageObject)
 		}
 	}
