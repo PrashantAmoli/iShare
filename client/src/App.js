@@ -19,6 +19,7 @@ const Page = styled.div`
 		rgba(32, 31, 41, 1) 78%
 	);
 	flex-direction: column;
+	font-size: 1.1rem;
 `
 
 const Container = styled.div`
@@ -132,11 +133,13 @@ const App = () => {
 
 	useEffect(() => {
 		const getUsername = async () => {
-			const name = (await prompt('Enter your name:')) || 'Anonymous'
+			let name
+			while (name == null || name == '') {
+				name = await prompt('Enter your name:')
+			}
 			await setUsername(name.toUpperCase())
-
 			socketRef.current.emit('new-user', {
-				body: `${name.toUpperCase()} just joined the chat.`,
+				body: `${name.toUpperCase()} 🅹🅾🅸🅽🅴🅳.`,
 				type: 'text',
 			})
 		}
@@ -175,6 +178,7 @@ const App = () => {
 				fileName: file.name,
 				username: username,
 			}
+			console.log(file.type)
 			setMessage('')
 			setFile('')
 			socketRef.current.emit('send message', messageObject)

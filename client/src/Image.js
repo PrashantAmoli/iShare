@@ -11,7 +11,7 @@ function Image(props) {
 		}
 	}, [props.blob])
 	return (
-		<img style={{ width: 150, height: 'auto', margin: 3 }} src={imageSrc} alt={props.fileName} />
+		<img style={{ width: 180, height: 'auto', margin: 3 }} src={imageSrc} alt={props.fileName} />
 	)
 }
 
