@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import io from 'socket.io-client'
 import Image from './Image'
+import './App.css'
 
 const Page = styled.div`
 	display: flex;
@@ -9,6 +10,14 @@ const Page = styled.div`
 	width: 100%;
 	align-items: center;
 	background-color: black;
+	background: rgb(12, 12, 12);
+	background: linear-gradient(
+		45deg,
+		rgba(12, 12, 12, 1) 15%,
+		rgba(25, 22, 65, 1) 43%,
+		rgba(12, 12, 46, 1) 58%,
+		rgba(32, 31, 41, 1) 78%
+	);
 	flex-direction: column;
 `
 
@@ -16,14 +25,14 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	height: 90vh;
-	max-height: 500px;
+	max-height: 512px;
 	overflow: auto;
 	width: 95%;
 	max-width: 400px;
 	border: 1px solid lightgray;
 	border-radius: 10px;
 	padding-bottom: 10px;
-	margin-top: 25px;
+	margin-top: 10px;
 	box-shadow: 0 0 9px 3px blue;
 `
 
@@ -61,15 +70,21 @@ const Button = styled.button`
 	background-color: red;
 	width: 95%;
 	border: none;
-	height: 50px;
+	height: 44px;
 	border-radius: 10px;
 	color: white;
 	font-size: 17px;
+	&:hover {
+		background-color: #000c86;
+		box-shadow: 1px 1px 3px 0px white;
+	}
 `
 
 const Form = styled.form`
 	width: 95%;
 	max-width: 400px;
+	display: flex;
+	flex-direction: column;
 `
 
 const MyRow = styled.div`
@@ -80,15 +95,15 @@ const MyRow = styled.div`
 `
 
 const MyMessage = styled.div`
-	width: 45%;
-	background-color: #11112e;
+	width: 77%;
+	background-color: #19113929;
 	border: 0.5px solid lightgray;
 	color: white;
 	padding: 10px;
 	margin-right: 5px;
-	text-align: center;
-	border-top-right-radius: 10%;
-	border-bottom-right-radius: 10%;
+	text-align: left;
+	border-radius: 30px 0 50px 30px;
+	overflow: hidden;
 `
 
 const PartnerRow = styled(MyRow)`
@@ -96,15 +111,14 @@ const PartnerRow = styled(MyRow)`
 `
 
 const PartnerMessage = styled.div`
-	width: 45%;
-	background-color: rgba(200, 0, 0, 0.3);
-	color: lightgray;
+	width: 77%;
+	background-color: rgb(80 80 80 / 30%);
+	color: white;
 	border: 0.5px solid lightgray;
 	padding: 10px;
 	margin-left: 5px;
-	text-align: center;
-	border-top-left-radius: 10%;
-	border-bottom-left-radius: 10%;
+	border-radius: 0 30px 30px 44px;
+	overflow: hidden;
 `
 
 const App = () => {
@@ -117,11 +131,15 @@ const App = () => {
 	const socketRef = useRef()
 
 	useEffect(() => {
-		function getUsername() {
-			const name = prompt('Enter your name:')
-			setUsername(name)
+		const getUsername = async () => {
+			const name = (await prompt('Enter your name:')) || 'Anonymous'
+			await setUsername(name.toUpperCase())
+
+			socketRef.current.emit('new-user', {
+				body: `${name.toUpperCase()} just joined the chat.`,
+				type: 'text',
+			})
 		}
-		getUsername()
 
 		socketRef.current = io.connect('/')
 
@@ -129,8 +147,14 @@ const App = () => {
 			setYourID(id)
 		})
 
+		getUsername()
+
 		socketRef.current.on('message', message => {
 			console.log('here')
+			receivedMessage(message)
+		})
+
+		socketRef.current.on('user-joined', message => {
 			receivedMessage(message)
 		})
 	}, [])
@@ -149,6 +173,7 @@ const App = () => {
 				body: file,
 				mimeType: file.type,
 				fileName: file.name,
+				username: username,
 			}
 			setMessage('')
 			setFile('')
@@ -158,10 +183,13 @@ const App = () => {
 				body: `${username}🢂 ${message}`,
 				id: yourID,
 				type: 'text',
+				username: username,
 			}
 			setMessage('')
 			setFile('')
-			socketRef.current.emit('send message', messageObject)
+			if (message != '') {
+				socketRef.current.emit('send message', messageObject)
+			}
 		}
 	}
 
@@ -207,13 +235,21 @@ const App = () => {
 
 	return (
 		<Page>
-			<h2 style={{ color: 'white', background: 'black' }}>iShare</h2>
+			{/* <h2 style={{ color: 'white', background: 'black' }}>iShare</h2> */}
+			<div className="container">
+				<span>i</span>
+				<span>S</span>
+				<span>H</span>
+				<span>A</span>
+				<span>R</span>
+				<span>E</span>
+			</div>
 
 			<Container>{messages.map(renderMessages)}</Container>
 
 			<Form onSubmit={sendMessage}>
 				<TextArea value={message} onChange={handleChange} placeholder="Message..." />
-				<Input onChange={selectFile} type="file" />
+				<Input onChange={selectFile} type="file" className="custom-file-input" />
 				<Button>Send</Button>
 			</Form>
 		</Page>
