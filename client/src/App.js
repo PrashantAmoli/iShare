@@ -134,7 +134,7 @@ const App = () => {
 	useEffect(() => {
 		const getUsername = async () => {
 			let name
-			while (name == null || name == '') {
+			while (name === null || name === '') {
 				name = await prompt('Enter your name:')
 			}
 			await setUsername(name.toUpperCase())
@@ -191,7 +191,7 @@ const App = () => {
 			}
 			setMessage('')
 			setFile('')
-			if (message != '') {
+			if (message !== '') {
 				socketRef.current.emit('send message', messageObject)
 			}
 		}
